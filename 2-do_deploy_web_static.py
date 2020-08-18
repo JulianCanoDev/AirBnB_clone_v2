@@ -1,38 +1,39 @@
 #!/usr/bin/python3
-# Fabric script that generates a .tgz archive from the contents
-
-from fabric import api
-from datetime import datetime
-from fabric.contrib import files
+"""
+Fabric script (based on the file 1-pack_web_static.py)
+"""
+from fabric.api import env
+from fabric.operations import run, put, sudo
 import os
-
-
-api.env.hosts = ['34.74.130.170', '34.235.167.111']
-api.env.key_filename = '~/.ssh/holberton'
-api.env.user = 'ubuntu'
+env.hosts = ['34.74.130.170', '34.235.167.111']
 
 
 def do_deploy(archive_path):
-    """do_deploy method"""
-    if not os.path.isfile(archive_path):
+    """
+        Function to deploy the Web Static on the server
+    """
+    if os.path.isfile(archive_path) is False:
         return False
-    with api.cd('/tmp'):
-        base = os.path.basename(archive_path)
-        root = os.path.splitext(base)
-        outpath = '/data/web_static/releases/{}'.format(root)
-        try:
-            putpath = api.put(archive_path)
-            if files.exists(outpath):
-                api.run('sudo rm -rdf {}'.format(outpath))
-                api.run('sudo mkdir -p {}'.format(outpath))
-                api.run('sudo tar -xzf {} -C {}'.format(putpath[0], outpath))
-                api.run('sudo rm -f {}'.format(putpath[0]))
-                api.run('sudo mv -u {}/web_static/* {}'.format(outpath, outpath))
-                api.run('sudo rm -rf {}/web_static'.format(outpath))
-                api.run('sudo rm -rf /data/web_static/current')
-                api.run('sudo ln -sf {} /data/web_static/current'.format(outpath))
-                print('New version deployed!')
-        except:
-            return False
-        else:
-            return True
+    try:
+        filename = archive_path.split("/")[-1]
+        path = "/data/web_static/releases"
+        put("{}".format(archive_path), "/tmp/{}"
+            .format(filename))
+        foldername = filename.split(".")
+        run("sudo mkdir -p {}/{}/"
+            .format(path, foldername[0]))
+        newfile = '.'.join(foldername)
+        run("sudo tar -xzf /tmp/{} -C {}/{}/"
+            .format(newfile, path, foldername[0]))
+        run("sudo rm /tmp/{}"
+            .format(filename))
+        run("sudo mv {}/{}/web_static/* {}/{}/"
+            .format(path, foldername[0], path, foldername[0]))
+        run("sudo rm -rf {}/{}/web_static"
+            .format(path, foldername[0]))
+        run("sudo rm -rf /data/web_static/current")
+        run("sudo ln -sf {}/{} /data/web_static/current"
+            .format(path, foldername[0]))
+        return True
+    except:
+        return False
