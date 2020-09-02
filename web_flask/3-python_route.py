@@ -22,8 +22,8 @@ def hello_route_3(text):
     return 'C {}'.format(text.replace('_', ' '))
 
 
-@app.route('/python/(<text>)', strict_slashes=False)
-def hello_route_4(text="is cool"):
+@app.route('/python/<text>', defaults={'text': 'is cool'})
+def hello_route4(text):
     """Return string 4"""
     return 'Python {}'.format(text.replace('_', ' '))
 
