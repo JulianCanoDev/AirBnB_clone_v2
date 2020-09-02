@@ -5,15 +5,15 @@ app = Flask('web_flask')
 
 
 @app.route('/', strict_slashes=False)
-def hello_route1():
+def hello_route_1():
     """Return string 1"""
     return 'Hello HBNB!'
 
 
 @app.route('/', strict_slashes=False)
-def hello_route2():
+def hello_route_2():
     """Return string 2"""
-    return 'HBNB!'
+    return 'HBNB'
 
 
 if __name__ == "__main__":
