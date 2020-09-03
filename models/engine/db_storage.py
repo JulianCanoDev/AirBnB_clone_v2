@@ -98,6 +98,6 @@ class DBStorage:
         Session = scoped_session(session)
         DBStorage.__session = Session()
 
-    
-
-
+    def close(self):
+        """Dispose of current session if active"""
+        self.__session.remove()
